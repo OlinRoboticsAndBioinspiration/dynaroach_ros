@@ -1,0 +1,3 @@
+[submodule "src/lib/dynaroach"]
+	path = src/lib/dynaroach
+	url = git@github.com:OlinRoboticsAndBioinspiration/dynaroach.git

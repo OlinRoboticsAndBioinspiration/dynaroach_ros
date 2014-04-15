@@ -17,10 +17,27 @@ from struct import pack, unpack
 from operator import attrgetter
 
 from lib import cmd
-from lib import dynaRoACH as dr
+from lib import dynaroach as dr
 from lib.basestation import BaseStation
 from lib.payload import Payload
 
+import rospy
+from std_msgs.msg import String
+
+def dynaroach_node(dynaroach):
+    pub = rospy.Publisher('dynaroach/time', String)
+    rospy.init_node('dynaroach_node', anonymous=True)
+    r = rospy.Rate(10) # 10hz
+    while not rospy.is_shutdown():
+        dynaroach.get_gyro_calib_param()
+        
+        str = "hello world %s"%rospy.get_time()
+        rospy.loginfo(str)
+        pub.publish(str)
+        r.sleep()
+
 if __name__ == '__main__':
-    d = dr.DynaRoach(sys.argv[1])
-    d.echo()
+
+    dr = dr.DynaRoach(sys.argv[1])
+
+    dynaroach_node(dr)
