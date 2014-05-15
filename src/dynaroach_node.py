@@ -3,7 +3,7 @@
 '''
 File: dynaroach_ros.py
 Author: Shivam S. Desai
-Date: 2014-04-04
+Date: 2014-05-15
 Description: A class representing the functionality necessary for testing and
 running the dynaRoACH robot using ROS.
 '''
@@ -36,6 +36,7 @@ class DynaRoachNode(dr.DynaRoach):
 
         super(DynaRoachNode, self).__init__(device_name)
 
+        # create publishers for all data being transmitted
         self.pub_packet = rospy.Publisher('dynaroach/packet', String)
         self.pub_time = rospy.Publisher('dynaroach/time', UInt32)
         self.pub_gyro_yaw = rospy.Publisher('dynaroach/gyro/yaw', Float32)
@@ -50,8 +51,8 @@ class DynaRoachNode(dr.DynaRoach):
 
         rospy.init_node('dynaroach_node', anonymous=True)
 
+        # Luke's feature to constantly send data
         self.service_set_data_streaming = rospy.Service('dynaroach/set_data_streaming', SetDataStreaming, self.ros_set_data_streaming)
-
         self.set_data_streaming(True)
 
         self.add_receive_callback(self.receive_packet)
