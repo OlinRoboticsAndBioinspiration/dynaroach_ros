@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 '''
 File: dynaroach_ros.py
 Author: Shivam S. Desai
@@ -9,15 +11,15 @@ running the dynaRoACH robot using ROS.
 import sys
 import time
 import math
-from functools import partial
+import os
 
 from serial import Serial, SerialException
 import numpy as np
 
 from struct import pack, unpack
 from operator import attrgetter
-
-sys.path.append("lib/dynaroach/python/")
+dir_name = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(dir_name + "/lib/dynaroach/python/")
 
 from lib import cmd
 import dynaroach as dr
@@ -26,8 +28,7 @@ from lib.payload import Payload
 
 import rospy
 from std_msgs.msg import *
-
-import atexit
+from dynaroach_ros.srv import *
 
 class DynaRoachNode(dr.DynaRoach):
 
@@ -49,6 +50,8 @@ class DynaRoachNode(dr.DynaRoach):
 
         rospy.init_node('dynaroach_node', anonymous=True)
 
+        self.service_set_data_streaming = rospy.Service('dynaroach/set_data_streaming', SetDataStreaming, self.ros_set_data_streaming)
+
         self.set_data_streaming(True)
 
         self.add_receive_callback(self.receive_packet)
@@ -58,6 +61,10 @@ class DynaRoachNode(dr.DynaRoach):
         self.add_receive_callback(self.receive_backemf)
         self.add_receive_callback(self.receive_hall)
         self.add_receive_callback(self.receive_batt)
+
+    def ros_set_data_streaming(self, req):
+        self.set_data_streaming(req.a)
+        return SetDataStreamingResponse(True)
 
     def receive_packet(self, payload):
         self.pub_packet.publish(str(payload))
